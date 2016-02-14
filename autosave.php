@@ -17,11 +17,12 @@ if (isset($_POST['textarea']))
 		$row = mysqli_fetch_array($result, MYSQLI_ASSOC);
 		if ($row['COUNT(*)'] == 0) // c'est un INSERT
 		{
-			$sql = "INSERT INTO textarea VALUES('', '".addslashes($_POST['textarea']).", NOW()')";
+			//$sql = "INSERT INTO textarea VALUES('', '".addslashes(htmlentities($_POST['textarea']))."', NOW(), '".$_POST['tmp_id'].')';
 		}
 		else
 		{
-			$sql = "UPDATE textarea SET content='".addslashes($_POST['textarea'])."', datetime=NOW() WHERE id='1'";
+			//$sql = "UPDATE textarea SET content='".addslashes(htmlentities($_POST['textarea']))."', datetime=NOW(), tmp_id='".$_POST['tmp_id']."' WHERE id='1'";
+			$sql = "UPDATE textarea SET content='".addslashes(htmlentities($_POST['textarea']))."', datetime=NOW(), tmp_id='".$_POST['tmp_id']."' WHERE id='1'";
 		}
 		mysqli_query($link, $sql);
 	//}

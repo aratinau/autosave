@@ -1,5 +1,5 @@
 <?php
-
+// Compare date
 require_once('connection_sql.php');
 
 $sql = "SELECT * FROM textarea WHERE id='".$_GET['id']."'";

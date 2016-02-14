@@ -57,9 +57,6 @@ foreach ($result as $elem)
 // puis si j'update la note, il est updated
 // et si je reupdate la note sur la meme page, il voie qu'il n'y a pas conflit
 //
-//enregistrer les htmlentities !!!!!!!!!!!!!!!
-//
-// et si je faisais un fucking load avant de faire quoique ce soit
 ?>
 
 <script>
@@ -74,6 +71,10 @@ $(document).ready(function() {
 		second = "" + now.getSeconds(); if (second.length == 1) { second = "0" + second; }
 		return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
 	}
+
+	var tmp_id = Math.floor((Math.random() * 10) + 4294967295);
+	console.log(tmp_id);
+
 	function autosave(data) {
 		$.ajax({
 			type: "post",
@@ -131,6 +132,23 @@ $(document).ready(function() {
 			}
 		});
 	}
+	function compare_tmp_id() {
+		$.ajax({
+			type: "post",
+			url: "compare_tmp_id.php?id=1",
+			data: 'tmp_id=' + tmp_id,
+			success: function(data) {
+				if(data == 1)
+				{
+					console.log('tmp id identique');
+				}
+				else
+				{
+					console.log('tmp id PAS identique');
+				}
+			}
+		});
+	}
 
 
 	console.log("total de textarea : " + ($('textarea').length));
@@ -141,12 +159,13 @@ $(document).ready(function() {
 		var dataString = 'textarea=' + $('textarea:eq(0)').val();
 		dataString += '&id=' + $('textarea:eq(0)').attr("data-id");
 		dataString += '&datetime=' + $('textarea:eq(0)').attr("data-datetime");
+		dataString += '&tmp_id=' + parseInt(tmp_id);
 		autosave(dataString);
+		console.log(dataString);
 		var datetime = new Date('Y-m-d H:i:s');
 		$('textarea:eq(0)').attr("data-datetime", js_yyyy_mm_dd_hh_mm_ss());
 		$('#content').text('content identique').css('color', 'green');
 		$("#state").text('datetime ok').css('color', 'green');
-
 	});
 
 	$('textarea:eq(0)').keyup(function () {
@@ -179,11 +198,11 @@ $(document).ready(function() {
 			success: function(data) {
 				$('textarea:eq(0)').val(data);
 		}});
+		compare_tmp_id();
 	});
 	compareDate($('textarea:eq(0)').attr("data-datetime"));
 	compareContent(textarea_value);
 	$('#get_content').hide();
-	console.log(Math.floor((Math.random() * 10) + 4294967295));
 });
 </script>
 
