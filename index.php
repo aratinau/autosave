@@ -42,20 +42,8 @@ foreach ($result as $elem)
 // TODO
 // install.php
 //
-// ajouter :
-// un date time + heure
-// un id du textarea
-//
-///!\ la base de donnee a changee
-//
 // afficher le contenu du serveur a cote pour conaitre les difference ?
 // afficher l'heure de la derniere synchro + le temps ecoule depuis celle ci
-//
-// generer un id unique au chargement de la page pour pas qu'il y ai conflit alors qu'on n'a fait qu'enregistrer sur cette page sans changer
-// et je pense que cet id doit etre enregistrer dans la bdd
-// comme ca il est generer au chargement de la page
-// puis si j'update la note, il est updated
-// et si je reupdate la note sur la meme page, il voie qu'il n'y a pas conflit
 //
 ?>
 
@@ -72,7 +60,7 @@ $(document).ready(function() {
 		return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
 	}
 
-	var tmp_id = Math.floor((Math.random() * 10) + 4294967295);
+	var tmp_id = Math.floor(429496729 * Math.random());
 	console.log(tmp_id);
 
 	function autosave(data) {
@@ -82,6 +70,16 @@ $(document).ready(function() {
 			data: data,
 			success: function(data) {
 				$('#sync').css('font-weight', 'normal');
+			}
+		});
+	}
+	function compare_tmp_id() {
+		$.ajax({
+			type: "post",
+			url: "compare_tmp_id.php?id=1",
+			data: 'tmp_id=' + parseInt(tmp_id),
+			success: function(data) {
+				return (data);
 			}
 		});
 	}
@@ -95,19 +93,22 @@ $(document).ready(function() {
 				if(data == 1)
 				{
 					//alert ('ok');
-					$("#state").text('datetime ok').css('color', 'green');
-			}
+					if (compare_tmp_id() == 0)
+					{
+						$("#state").text('datetime ok').css('color', 'green');
+					}
+				}
 				else
 				{ //alert ('la date sur le serveur est plus recente, conflit');
-					$("#state").text('conflit avec le serveur : sync ecrasera avec cette version').css('color', 'red');
-					$.ajax({
-						type: "post",
-						url: "get_content.php?id=1",
-						data: 'datetime=' + date,
-						success: function(data) {
-							$('#get_content').show(500);
-							$('#get_content').html(data.replace(/\n/g, "<br />"));
-					}});
+						$("#state").text('conflit avec le serveur : sync ecrasera avec cette version').css('color', 'red');
+						$.ajax({
+							type: "post",
+								url: "get_content.php?id=1",
+								data: 'datetime=' + date,
+								success: function(data) {
+									$('#get_content').show(500);
+									$('#get_content').html(data.replace(/\n/g, "<br />"));
+								}});
 				}
 			}
 		});
@@ -122,7 +123,10 @@ $(document).ready(function() {
 			success: function(data) {
 				if(data == 1)
 				{
-					$('#content').text('content identique').css('color', 'green');
+					if (compare_tmp_id() == 0)
+					{
+						$('#content').text('content identique').css('color', 'green');
+					}
 				}
 				else
 				{
@@ -132,24 +136,6 @@ $(document).ready(function() {
 			}
 		});
 	}
-	function compare_tmp_id() {
-		$.ajax({
-			type: "post",
-			url: "compare_tmp_id.php?id=1",
-			data: 'tmp_id=' + tmp_id,
-			success: function(data) {
-				if(data == 1)
-				{
-					console.log('tmp id identique');
-				}
-				else
-				{
-					console.log('tmp id PAS identique');
-				}
-			}
-		});
-	}
-
 
 	console.log("total de textarea : " + ($('textarea').length));
 	//console.log($('textarea')[0]);
@@ -196,7 +182,7 @@ $(document).ready(function() {
 			type: "post",
 			url: "get_content.php?id=1",
 			success: function(data) {
-				$('textarea:eq(0)').val(data);
+				//$('textarea:eq(0)').val(data);
 		}});
 		compare_tmp_id();
 	});
